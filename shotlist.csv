@@ -9,7 +9,7 @@ id,image_prompt,motion_prompt,caption,duration,status
 008,balancing on top of a round mushroom,"wobbles while balancing on the mushroom, loses balance and tumbles off, climbs back up giggling, full body, vertical, camera static",,10,gen:3
 009,pushing a big round berry,"rolls a big berry forward, the berry rolls back over it and flattens it like plush, pops out and cheers, full body, vertical, camera static",,10,gen:3
 010,reaching up for a falling leaf,"tries to catch a falling leaf, misses and tumbles backward, then catches the next leaf proudly, full body, vertical, camera static",,10,gen:3
-011,sitting at the top of a smooth stone slide,"slides down the smooth stone, bumps at the bottom and topples over, stands up beaming, full body, vertical, camera static",,10,
+011,sitting at the top of a smooth stone slide,"slides down the smooth stone, bumps at the bottom and topples over, stands up beaming, full body, vertical, camera static",,10,gen:4
 012,holding a tiny watering can by a sprout,"waters a tiny sprout, slips on a splash of water and tumbles, then the sprout pops up and it claps happily, full body, vertical, camera static",,10,
 013,standing in front of a small twig on the ground,"takes a running hop over the twig, clips it and tumbles forward, hops back up grinning, full body, vertical, camera static",,10,
 014,carrying a small stack of berries,"carries a stack of berries, trips and drops them everywhere, gathers one up and smiles shyly, full body, vertical, camera static",,10,
