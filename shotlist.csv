@@ -1,9 +1,9 @@
 id,image_prompt,motion_prompt,caption,duration,status
-001,standing on a giant glossy leaf ready to dance,"dances happily with bouncy steps, then slips and tumbles off balance, springs back up beaming, gentle bounce, soft squash and stretch, full body, vertical, camera static",,10,
-002,standing beside a small puddle ready to hop,"hops over the small puddle, slightly slips on landing and wobbles, then steadies and grins proudly, gentle bounce, full body, vertical, camera static",,10,
-003,standing in a pile of autumn leaves,"twirls in the pile of autumn leaves, trips and tumbles into them, pops its head out wearing a leaf on top, happy smile, full body, vertical, camera static",,10,
-004,kneeling beside a small pile of acorns,"stacks acorns into a tall tower, the tower wobbles and topples over, picks one acorn up looking proud, full body, vertical, camera static",,10,
-005,standing leaning into a strong breeze,"leans into a strong breeze, gets blown over and tumbles, then stands up with a triumphant little pose, full body, vertical, camera static",,10,
+001,standing on a giant glossy leaf ready to dance,"dances happily with bouncy steps, then slips and tumbles off balance, springs back up beaming, gentle bounce, soft squash and stretch, full body, vertical, camera static",,10,gen:2
+002,standing beside a small puddle ready to hop,"hops over the small puddle, slightly slips on landing and wobbles, then steadies and grins proudly, gentle bounce, full body, vertical, camera static",,10,gen:2
+003,standing in a pile of autumn leaves,"twirls in the pile of autumn leaves, trips and tumbles into them, pops its head out wearing a leaf on top, happy smile, full body, vertical, camera static",,10,gen:2
+004,kneeling beside a small pile of acorns,"stacks acorns into a tall tower, the tower wobbles and topples over, picks one acorn up looking proud, full body, vertical, camera static",,10,gen:2
+005,standing leaning into a strong breeze,"leans into a strong breeze, gets blown over and tumbles, then stands up with a triumphant little pose, full body, vertical, camera static",,10,gen:2
 006,standing upright about to bow politely,"practices a polite bow, leans too far and topples forward, sits up with a shy embarrassed giggle, full body, vertical, camera static",,10,
 007,looking up at a fluttering butterfly,"chases a butterfly with happy little jumps, trips over a pebble and tumbles, then sits up and waves at the butterfly cheerfully, full body, vertical, camera static",,10,
 008,balancing on top of a round mushroom,"wobbles while balancing on the mushroom, loses balance and tumbles off, climbs back up giggling, full body, vertical, camera static",,10,
