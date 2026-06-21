@@ -1,7 +1,12 @@
 name: generate-batch
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "生成本数（テストは 1）"
+        required: false
+        default: "5"
   schedule:
     - cron: "0 22 * * 0"   # 毎週日曜22:00 UTC（≈ 月曜07:00 JST）
 
@@ -26,7 +31,7 @@ jobs:
           FAL_KEY: ${{ secrets.FAL_KEY }}
           LORA_URL: ${{ secrets.LORA_URL }}
           TRIGGER_WORD: leafy_catspirit
-          BATCH_SIZE: "5"
+          BATCH_SIZE: ${{ github.event.inputs.batch_size || '5' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python pipeline.py
       - name: Commit backlog progress
