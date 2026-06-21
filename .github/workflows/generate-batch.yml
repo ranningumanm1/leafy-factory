@@ -1,0 +1,32 @@
+name: generate-batch
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 22 * * 0"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Install python deps
+        run: pip install -r requirements.txt
+      - name: Generate clips
+        env:
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          LORA_URL: ${{ secrets.LORA_URL }}
+          TRIGGER_WORD: leafy_catspirit
+        run: python pipeline.py
+      - name: Upload clips for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: clips-${{ github.run_number }}
+          path: output/*.mp4
+          retention-days: 14
