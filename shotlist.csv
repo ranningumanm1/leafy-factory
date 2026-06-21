@@ -1,6 +1,21 @@
-id,image_prompt,motion_prompt,caption,duration
-001,standing center ready to dance,"dances happily with bouncy steps then trips over its own tail and squashes flat like plush, instantly springs back up with a big joyful smile, exaggerated squash and stretch, comedic, camera static",おっとっと,5
-002,mid dance pose,"spins, gets dizzy, stumbles sideways and plops down, then grins and gives a little cheer, bouncy and clumsy, camera static",めげない,5
-003,about to jump,"jumps for a big finish, lands badly and flattens, wobbles back into shape smiling, springy squash and stretch, camera static",だいじょうぶ,5
-004,greeting with a wave,"waves cheerfully, takes a step and trips, falls softly, pops back up beaming, light and bright, camera static",やっほー,5
-005,happy idle,"does a cute little dance, tail tangles its feet and it tumbles, then sits up laughing, comedic timing, camera static",へへっ,5
+id,image_prompt,motion_prompt,caption,duration,status
+001,standing on a giant glossy leaf ready to dance,"dances happily with bouncy steps, then slips and tumbles off balance, springs back up beaming, gentle bounce, soft squash and stretch, full body, vertical, camera static",,10,
+002,standing beside a small puddle ready to hop,"hops over the small puddle, slightly slips on landing and wobbles, then steadies and grins proudly, gentle bounce, full body, vertical, camera static",,10,
+003,standing in a pile of autumn leaves,"twirls in the pile of autumn leaves, trips and tumbles into them, pops its head out wearing a leaf on top, happy smile, full body, vertical, camera static",,10,
+004,kneeling beside a small pile of acorns,"stacks acorns into a tall tower, the tower wobbles and topples over, picks one acorn up looking proud, full body, vertical, camera static",,10,
+005,standing leaning into a strong breeze,"leans into a strong breeze, gets blown over and tumbles, then stands up with a triumphant little pose, full body, vertical, camera static",,10,
+006,standing upright about to bow politely,"practices a polite bow, leans too far and topples forward, sits up with a shy embarrassed giggle, full body, vertical, camera static",,10,
+007,looking up at a fluttering butterfly,"chases a butterfly with happy little jumps, trips over a pebble and tumbles, then sits up and waves at the butterfly cheerfully, full body, vertical, camera static",,10,
+008,balancing on top of a round mushroom,"wobbles while balancing on the mushroom, loses balance and tumbles off, climbs back up giggling, full body, vertical, camera static",,10,
+009,pushing a big round berry,"rolls a big berry forward, the berry rolls back over it and flattens it like plush, pops out and cheers, full body, vertical, camera static",,10,
+010,reaching up for a falling leaf,"tries to catch a falling leaf, misses and tumbles backward, then catches the next leaf proudly, full body, vertical, camera static",,10,
+011,sitting at the top of a smooth stone slide,"slides down the smooth stone, bumps at the bottom and topples over, stands up beaming, full body, vertical, camera static",,10,
+012,holding a tiny watering can by a sprout,"waters a tiny sprout, slips on a splash of water and tumbles, then the sprout pops up and it claps happily, full body, vertical, camera static",,10,
+013,standing in front of a small twig on the ground,"takes a running hop over the twig, clips it and tumbles forward, hops back up grinning, full body, vertical, camera static",,10,
+014,carrying a small stack of berries,"carries a stack of berries, trips and drops them everywhere, gathers one up and smiles shyly, full body, vertical, camera static",,10,
+015,posing to show off its little leaf cape,"does a proud spin to show off its leaf cape, gets dizzy and plops down, then gives a happy thumbs-up pose, full body, vertical, camera static",,10,
+016,standing before a row of stepping stones,"tiptoes across stepping stones, slips on one with a splash, then strikes a happy recovered pose, full body, vertical, camera static",,10,
+017,holding a fluffy dandelion,"tries to blow a dandelion, puffs too hard and tips over backward, sits up laughing, full body, vertical, camera static",,10,
+018,standing at the foot of a small grassy mound,"climbs a small mound, slides back down, reaches the top on the second try cheering, full body, vertical, camera static",,10,
+019,peeking out from behind a big leaf,"peeks out from behind a big leaf, leans too far and tumbles out, then smiles bashfully, full body, vertical, camera static",,10,
+020,standing ready for a happy hop-dance,"does a joyful hop-dance, lands off balance and tumbles, springs up with a triumphant pose, full body, vertical, camera static",,10,

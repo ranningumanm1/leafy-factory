@@ -1,47 +1,43 @@
-name: generate-batch
+name: publish
 
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 22 * * 0"   # 毎週日曜22:00 UTC（≈ 月曜07:00 JST）
+    - cron: "0 * * * *"    # 毎時：Telegramの押下を回収し、承認済みを1日1本ドリップ投稿
 
 permissions:
-  contents: write          # Releaseアップロード & state/shotlist の push に必要
+  contents: write          # state.json の push に必要
 
 concurrency:
-  group: leafy-state       # publish と state.json を取り合わないよう直列化
+  group: leafy-state       # generate と state.json を取り合わないよう直列化
   cancel-in-progress: false
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install system deps
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
       - name: Install python deps
         run: pip install -r requirements.txt
-      - name: Generate clips
+      - name: Collect approvals & drip-publish
         env:
-          FAL_KEY: ${{ secrets.FAL_KEY }}
-          LORA_URL: ${{ secrets.LORA_URL }}
-          TRIGGER_WORD: leafy_catspirit
-          BATCH_SIZE: "5"
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python pipeline.py
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          POSTS_PER_DAY: "1"
+        run: python publisher.py
       - name: Commit state
         run: |
           git config user.name "leafy-bot"
           git config user.email "leafy-bot@users.noreply.github.com"
-          git add state.json shotlist.csv || true
+          git add state.json || true
           git diff --cached --quiet && echo "no changes" && exit 0
-          git commit -m "chore: クリップ生成・状態更新 [skip ci]"
+          git commit -m "chore: 承認回収・投稿状況更新 [skip ci]"
           for i in 1 2 3; do
             git pull --rebase --autostash && git push && break
             sleep 5
