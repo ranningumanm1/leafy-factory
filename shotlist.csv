@@ -4,11 +4,11 @@ id,image_prompt,motion_prompt,caption,duration,status
 003,standing in a pile of autumn leaves,"twirls in the pile of autumn leaves, trips and tumbles into them, pops its head out wearing a leaf on top, happy smile, full body, vertical, camera static",,10,gen:2
 004,kneeling beside a small pile of acorns,"stacks acorns into a tall tower, the tower wobbles and topples over, picks one acorn up looking proud, full body, vertical, camera static",,10,gen:2
 005,standing leaning into a strong breeze,"leans into a strong breeze, gets blown over and tumbles, then stands up with a triumphant little pose, full body, vertical, camera static",,10,gen:2
-006,standing upright about to bow politely,"practices a polite bow, leans too far and topples forward, sits up with a shy embarrassed giggle, full body, vertical, camera static",,10,
-007,looking up at a fluttering butterfly,"chases a butterfly with happy little jumps, trips over a pebble and tumbles, then sits up and waves at the butterfly cheerfully, full body, vertical, camera static",,10,
-008,balancing on top of a round mushroom,"wobbles while balancing on the mushroom, loses balance and tumbles off, climbs back up giggling, full body, vertical, camera static",,10,
-009,pushing a big round berry,"rolls a big berry forward, the berry rolls back over it and flattens it like plush, pops out and cheers, full body, vertical, camera static",,10,
-010,reaching up for a falling leaf,"tries to catch a falling leaf, misses and tumbles backward, then catches the next leaf proudly, full body, vertical, camera static",,10,
+006,standing upright about to bow politely,"practices a polite bow, leans too far and topples forward, sits up with a shy embarrassed giggle, full body, vertical, camera static",,10,gen:3
+007,looking up at a fluttering butterfly,"chases a butterfly with happy little jumps, trips over a pebble and tumbles, then sits up and waves at the butterfly cheerfully, full body, vertical, camera static",,10,gen:3
+008,balancing on top of a round mushroom,"wobbles while balancing on the mushroom, loses balance and tumbles off, climbs back up giggling, full body, vertical, camera static",,10,gen:3
+009,pushing a big round berry,"rolls a big berry forward, the berry rolls back over it and flattens it like plush, pops out and cheers, full body, vertical, camera static",,10,gen:3
+010,reaching up for a falling leaf,"tries to catch a falling leaf, misses and tumbles backward, then catches the next leaf proudly, full body, vertical, camera static",,10,gen:3
 011,sitting at the top of a smooth stone slide,"slides down the smooth stone, bumps at the bottom and topples over, stands up beaming, full body, vertical, camera static",,10,
 012,holding a tiny watering can by a sprout,"waters a tiny sprout, slips on a splash of water and tumbles, then the sprout pops up and it claps happily, full body, vertical, camera static",,10,
 013,standing in front of a small twig on the ground,"takes a running hop over the twig, clips it and tumbles forward, hops back up grinning, full body, vertical, camera static",,10,
