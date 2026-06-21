@@ -1,13 +1,12 @@
 """
-生成パイプライン（週次の自動運転の前半）。
+生成パイプライン（クラウド側＝GitHub Actionsで自動運転）。
   1) shotlist.csv = ネタ貯金 から「未使用(status空)」を先頭N件だけ取り出す
   2) 各件: LoRAでキーフレーム → Kling で動画 → ffmpeg で 9:16 整形（字幕は焼かない）
-  3) 最終mp4を GitHub Releases にアップ（= Instagram が取得できる公開URL）
-  4) Telegram に OK/NG ボタン付きで配信し、state.json に「承認待ち」で登録
-  5) shotlist.csv の該当行を使用済みに印（次回は次のネタへ進む）
+  3) 最終mp4を GitHub Releases にアップ（= Macが取りに来られる公開URL）
+  4) shotlist.csv の該当行を使用済みに印（次回は次のネタへ進む）
 
-固定する層 = キャラ（LoRA + トリガー語）。変える層 = shotlist.csv のネタだけ。
-人がやるのは Telegram で OK/NG を押すことだけ。投稿は publisher.py が自動でやる。
+完成クリップの受け取りは Mac 側の mac/fetch_clips.command が担当（Releasesから写真アプリへ）。
+投稿は人が手動。ここは「作って置いておく」までが仕事。
 """
 import os
 import csv
@@ -18,20 +17,23 @@ import datetime
 import requests
 import fal_client
 
-import common
-
 LORA_URL = os.environ["LORA_URL"]
 TRIGGER = os.environ.get("TRIGGER_WORD", "leafy_catspirit")
 IMAGE_MODEL = os.environ.get("IMAGE_MODEL", "fal-ai/flux-lora")
 VIDEO_MODEL = os.environ.get("VIDEO_MODEL", "fal-ai/kling-video/v2.1/standard/image-to-video")
 VIDEO_IMAGE_PARAM = os.environ.get("VIDEO_IMAGE_PARAM", "image_url")
-BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "5"))   # 1回の自動運転で生成する本数
+BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "5"))
 RUN_ID = os.environ.get("GITHUB_RUN_NUMBER") or datetime.date.today().isoformat()
 CAPTION_FONT = os.environ.get(
     "CAPTION_FONT", "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
 SHOTLIST = "shotlist.csv"
 OUT_DIR = pathlib.Path("output")
 OUT_DIR.mkdir(exist_ok=True)
+
+# GitHub Releases（完成クリップの公開URL置き場。MacがここからDLする）
+GH_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GH_REPO = os.environ.get("GITHUB_REPOSITORY", "")
+RELEASE_TAG = os.environ.get("RELEASE_TAG", "clips")
 
 CHAR_CORE = (
     "original chibi mascot cat, 2-head-tall, fluffy lime-green fur, white face and belly, "
@@ -94,6 +96,41 @@ def finalize(raw_video: str, out_path: str, caption: str):
                    check=True)
 
 
+def _gh_headers():
+    return {"Authorization": f"Bearer {GH_TOKEN}",
+            "Accept": "application/vnd.github+json"}
+
+
+def _ensure_release() -> dict:
+    r = requests.get(
+        f"https://api.github.com/repos/{GH_REPO}/releases/tags/{RELEASE_TAG}",
+        headers=_gh_headers(), timeout=30)
+    if r.status_code == 200:
+        return r.json()
+    r = requests.post(
+        f"https://api.github.com/repos/{GH_REPO}/releases",
+        headers=_gh_headers(), timeout=30,
+        json={"tag_name": RELEASE_TAG, "name": "Leafy clips",
+              "body": "自動生成クリップの置き場（Macが取りに来る）"})
+    r.raise_for_status()
+    return r.json()
+
+
+def upload_clip(file_path: str, asset_name: str) -> str:
+    """mp4をReleaseアセットとしてアップロードし、公開URLを返す。"""
+    release = _ensure_release()
+    for a in release.get("assets", []):
+        if a["name"] == asset_name:
+            requests.delete(a["url"], headers=_gh_headers(), timeout=30)
+    upload_url = release["upload_url"].split("{")[0]
+    with open(file_path, "rb") as f:
+        r = requests.post(f"{upload_url}?name={asset_name}",
+                          headers={**_gh_headers(), "Content-Type": "video/mp4"},
+                          data=f.read(), timeout=600)
+    r.raise_for_status()
+    return r.json()["browser_download_url"]
+
+
 def write_backlog(fieldnames, rows):
     with open(SHOTLIST, "w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
@@ -109,13 +146,12 @@ def main():
 
     todo = [r for r in rows if not r.get("status", "").strip()][:BATCH_SIZE]
     if not todo:
-        common.tg_notify("⚠️ ネタ貯金(shotlist.csv)が尽きました。新しいネタを足してください。")
-        print("[i] 未使用ネタなし。終了")
+        print("[i] 未使用ネタなし。shotlist.csv に行を足してください。終了")
         return
-    print(f"[i] {len(todo)} 本を生成する（残り未使用: "
-          f"{sum(1 for r in rows if not r.get('status','').strip())} 本）")
+    remaining = sum(1 for r in rows if not r.get("status", "").strip())
+    print(f"[i] {len(todo)} 本を生成する（残り未使用: {remaining} 本）")
 
-    state = common.load_state()
+    made = 0
     for row in todo:
         sid = row["id"].strip()
         key = f"{RUN_ID}_{sid}"
@@ -129,26 +165,15 @@ def main():
             finalize(str(raw_path), str(final_path), row.get("caption", ""))
             raw_path.unlink(missing_ok=True)
 
-            public_url = common.gh_upload_clip(str(final_path), f"{key}.mp4")
-            msg_id = common.tg_send_video(str(final_path), key,
-                                          caption=f"leafy {key}\nOKを押すと自動投稿待ちに入ります")
-            state["clips"][key] = {
-                "url": public_url,
-                "caption": row.get("caption", ""),
-                "status": "pending",
-                "tg_message_id": msg_id,
-                "created": datetime.datetime.utcnow().isoformat(timespec="seconds"),
-            }
-            row["status"] = f"gen:{RUN_ID}"   # 使用済みに印（失敗時は空のまま＝次回再挑戦）
+            public_url = upload_clip(str(final_path), f"{key}.mp4")
+            row["status"] = f"gen:{RUN_ID}"   # 使用済み（失敗時は空のまま＝次回再挑戦）
+            made += 1
             print("  done:", public_url)
         except Exception as e:
             print(f"  [!] shot {key} 失敗: {e}")
 
-    common.save_state(state)
     write_backlog(fieldnames, rows)
-    common.tg_notify(f"🌱 新しいクリップを {len(todo)} 本お届けしました。"
-                     f"OK/NG を選んでね（OKは1日1本ずつ自動投稿されます）")
-    print("\n[i] Telegram を確認 → OK/NG を押す")
+    print(f"\n[i] 完成 {made} 本。Mac の fetch_clips.command で写真アプリに取り込めます")
 
 
 if __name__ == "__main__":
