@@ -49,12 +49,19 @@ CHAR_CORE = (
 )
 NEG = ("fire, flame, magical aura, glowing powers, collectible monster, game creature, "
        "branded product, logo, human proportions, realistic skin, scary, text, watermark, "
-       "resembling any existing franchise character")
+       "resembling any existing franchise character, "
+       "plain white background, blank studio backdrop, empty background")
+
+# 背景の世界観（ここを差し替えれば季節・舞台を変えられる）
+BACKGROUND = os.environ.get(
+    "BACKGROUND",
+    "in a cozy autumn forest, warm golden-hour light, colorful red and orange fallen maple leaves, "
+    "soft blurred bokeh autumn trees, gentle depth of field, whimsical storybook atmosphere")
 
 
 def gen_keyframe(image_prompt: str) -> str:
     r = fal_client.subscribe(IMAGE_MODEL, arguments={
-        "prompt": f"{TRIGGER}, {CHAR_CORE}, {image_prompt}, clean simple background",
+        "prompt": f"{TRIGGER}, {CHAR_CORE}, {image_prompt}, {BACKGROUND}",
         "negative_prompt": NEG,
         "loras": [{"path": LORA_URL, "scale": 1.0}],
         "image_size": "portrait_16_9",
