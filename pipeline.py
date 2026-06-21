@@ -1,7 +1,7 @@
 """
 生成パイプライン（クラウド側＝GitHub Actionsで自動運転）。
   1) shotlist.csv = ネタ貯金 から「未使用(status空)」を先頭N件だけ取り出す
-  2) 各件: LoRAでキーフレーム → Kling で動画 → ffmpeg で 9:16 整形（字幕は焼かない）
+  2) 各件: LoRAでキーフレーム → Kling で動画 → mmaudioで動きに合う効果音 → ffmpeg 9:16整形（字幕なし）
   3) 最終mp4を GitHub Releases にアップ（= Macが取りに来られる公開URL）
   4) shotlist.csv の該当行を使用済みに印（次回は次のネタへ進む）
 
@@ -22,6 +22,11 @@ TRIGGER = os.environ.get("TRIGGER_WORD", "leafy_catspirit")
 IMAGE_MODEL = os.environ.get("IMAGE_MODEL", "fal-ai/flux-lora")
 VIDEO_MODEL = os.environ.get("VIDEO_MODEL", "fal-ai/kling-video/v2.1/standard/image-to-video")
 VIDEO_IMAGE_PARAM = os.environ.get("VIDEO_IMAGE_PARAM", "image_url")
+# 効果音: fal mmaudio が動画を見て、動きに同期した音を生成する
+AUDIO_MODEL = os.environ.get("AUDIO_MODEL", "fal-ai/mmaudio-v2")
+ADD_AUDIO = os.environ.get("ADD_AUDIO", "1") not in ("0", "false", "False", "")
+SFX_NEG = os.environ.get(
+    "SFX_NEG", "music, song, melody, human voice, speech, lyrics, harsh noise, distortion")
 BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "5"))
 RUN_ID = os.environ.get("GITHUB_RUN_NUMBER") or datetime.date.today().isoformat()
 CAPTION_FONT = os.environ.get(
@@ -65,8 +70,21 @@ def gen_video(image_url: str, motion_prompt: str, duration: int) -> str:
     r = fal_client.subscribe(VIDEO_MODEL, arguments={
         "prompt": motion_prompt,
         "duration": str(duration),
-        "generate_audio": False,
+        "generate_audio": False,   # 音は mmaudio で別途・動きに合わせて付ける
         VIDEO_IMAGE_PARAM: image_url,
+    })
+    return r["video"]["url"]
+
+
+def gen_audio(video_url: str, motion_prompt: str) -> str:
+    """動画を見て、動きに同期した可愛い効果音を生成（音入り動画のURLを返す）。"""
+    prompt = ("cute playful cartoon sound effects, soft bouncy boing, gentle plop and tumble, "
+              "light squeaky-toy pops, springy cartoon foley, kawaii and wholesome, "
+              "matching the action: " + motion_prompt)
+    r = fal_client.subscribe(AUDIO_MODEL, arguments={
+        "video_url": video_url,
+        "prompt": prompt,
+        "negative_prompt": SFX_NEG,
     })
     return r["video"]["url"]
 
@@ -92,7 +110,8 @@ def finalize(raw_video: str, out_path: str, caption: str):
                "fontcolor=white:fontsize=64:borderw=5:bordercolor=black@0.9:"
                "x=(w-text_w)/2:y=h-300")
     subprocess.run(["ffmpeg", "-y", "-i", raw_video, "-vf", vf,
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", out_path],
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                    "-c:a", "aac", "-b:a", "128k", out_path],
                    check=True)
 
 
@@ -159,6 +178,12 @@ def main():
         try:
             img = gen_keyframe(row["image_prompt"])
             vid = gen_video(img, row["motion_prompt"], int(row.get("duration", 5) or 5))
+            if ADD_AUDIO:
+                try:
+                    vid = gen_audio(vid, row["motion_prompt"])
+                    print("  + 効果音を付与")
+                except Exception as ae:
+                    print(f"  [!] 効果音の付与に失敗（無音で続行）: {ae}")
             raw_path = OUT_DIR / f"{key}_raw.mp4"
             final_path = OUT_DIR / f"{key}.mp4"
             download(vid, str(raw_path))
