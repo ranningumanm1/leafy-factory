@@ -91,8 +91,10 @@ def gen_video(image_url: str, motion_prompt: str, duration: int) -> str:
 
 def gen_audio(video_url: str, motion_prompt: str) -> str:
     """動画を見て、動きに同期した可愛い効果音を生成（音入り動画のURLを返す）。"""
-    prompt = ("cute playful cartoon sound effects, soft bouncy boing, gentle plop and tumble, "
-              "light squeaky-toy pops, springy cartoon foley, kawaii and wholesome, "
+    prompt = ("cute playful cartoon sound effects, "
+              "soft squishy plush footsteps, puni-puni squishy paw steps, gentle padding steps, "
+              "soft bouncy boing, gentle plop and tumble, light squeaky-toy pops, "
+              "springy cartoon foley, kawaii and wholesome, "
               "matching the action: " + motion_prompt)
     r = fal_client.subscribe(AUDIO_MODEL, arguments={
         "video_url": video_url,
