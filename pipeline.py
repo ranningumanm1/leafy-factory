@@ -40,12 +40,18 @@ GH_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GH_REPO = os.environ.get("GITHUB_REPOSITORY", "")
 RELEASE_TAG = os.environ.get("RELEASE_TAG", "clips")
 
+# キャラの芯（CHARACTER.md の公式設定と一致させる固定ワード）
 CHAR_CORE = (
-    "original chibi mascot cat, 2-head-tall, fluffy lime-green fur, white face and belly, "
-    "a green swirl mark on the belly, large round expressive eyes, "
-    "tiny triangular cat ears with sunny-yellow inner, small leaf-shaped spikes around the head, "
-    "heart-shaped leaf tail tip, small leaf cape with a gold clasp, "
-    "soft plush toy texture, cute genuine smile, soft 3D cartoon render"
+    "original chibi plush cat spirit, 2-head-tall, fluffy lime-green fur, "
+    "white face belly and paw-tips, pink paw pads, "
+    "large round expressive green eyes, pink blush cheeks, cheerful smile with a tiny fang, "
+    "a small orange-gold flower mark on the forehead, "
+    "triangular cat ears with sunny-yellow inner and a small white flower at the inner base, "
+    "green leaf-shaped spikes around the head with a curled green sprout on top, "
+    "a green swirl leaf mark on the belly (Leafy's emblem), "
+    "heart-shaped leaf tail tip with a gold swirl that curls, "
+    "small green leaf cape with gold trim and an acorn pendant clasp, "
+    "soft plush toy texture, soft 3D cartoon render, whimsical storybook style"
 )
 NEG = ("fire, flame, magical aura, glowing powers, collectible monster, game creature, "
        "branded product, logo, human proportions, realistic skin, scary, text, watermark, "
