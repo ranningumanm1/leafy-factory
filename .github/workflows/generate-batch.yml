@@ -7,6 +7,11 @@ on:
         description: "生成本数（テストは 1）"
         required: false
         default: "5"
+      mode:
+        description: "image=画像のみ(安い・Klingで動画化) / video=falで動画まで(高い)"
+        type: choice
+        options: ["image", "video"]
+        default: "image"
   schedule:
     - cron: "0 22 * * 0"   # 毎週日曜22:00 UTC（≈ 月曜07:00 JST）
 
@@ -32,6 +37,7 @@ jobs:
           LORA_URL: ${{ secrets.LORA_URL }}
           TRIGGER_WORD: leafy_catspirit
           BATCH_SIZE: ${{ github.event.inputs.batch_size || '5' }}
+          IMAGE_ONLY: ${{ (github.event.inputs.mode || 'image') == 'video' && '0' || '1' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python pipeline.py
       - name: Commit backlog progress

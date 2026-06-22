@@ -27,6 +27,8 @@ AUDIO_MODEL = os.environ.get("AUDIO_MODEL", "fal-ai/mmaudio-v2")
 ADD_AUDIO = os.environ.get("ADD_AUDIO", "1") not in ("0", "false", "False", "")
 SFX_NEG = os.environ.get(
     "SFX_NEG", "music, song, melody, human voice, speech, lyrics, harsh noise, distortion")
+# 画像のみモード: falではキャラ画像だけ生成（安い）。動画化は Kling.ai Pro で手動。
+IMAGE_ONLY = os.environ.get("IMAGE_ONLY", "0") not in ("0", "false", "False", "")
 BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "5"))
 RUN_ID = os.environ.get("GITHUB_RUN_NUMBER") or datetime.date.today().isoformat()
 CAPTION_FONT = os.environ.get(
@@ -150,8 +152,8 @@ def _ensure_release() -> dict:
     return r.json()
 
 
-def upload_clip(file_path: str, asset_name: str) -> str:
-    """mp4をReleaseアセットとしてアップロードし、公開URLを返す。"""
+def upload_asset(file_path: str, asset_name: str, content_type: str = "video/mp4") -> str:
+    """ファイルをReleaseアセットとしてアップロードし、公開URLを返す。"""
     release = _ensure_release()
     for a in release.get("assets", []):
         if a["name"] == asset_name:
@@ -159,7 +161,7 @@ def upload_clip(file_path: str, asset_name: str) -> str:
     upload_url = release["upload_url"].split("{")[0]
     with open(file_path, "rb") as f:
         r = requests.post(f"{upload_url}?name={asset_name}",
-                          headers={**_gh_headers(), "Content-Type": "video/mp4"},
+                          headers={**_gh_headers(), "Content-Type": content_type},
                           data=f.read(), timeout=600)
     r.raise_for_status()
     return r.json()["browser_download_url"]
@@ -192,6 +194,16 @@ def main():
         print(f"\n=== shot {key} ===")
         try:
             img = gen_keyframe(row["image_prompt"])
+            if IMAGE_ONLY:
+                # falは画像だけ。動画化は Kling.ai Pro で手動（コスト削減）
+                img_path = OUT_DIR / f"{key}.jpg"
+                download(img, str(img_path))
+                public_url = upload_asset(str(img_path), f"{key}.jpg", "image/jpeg")
+                row["status"] = f"img:{RUN_ID}"
+                made += 1
+                print("  image:", public_url)
+                print("  Kling用プロンプト:", row["motion_prompt"])
+                continue
             vid = gen_video(img, row["motion_prompt"], int(row.get("duration", 5) or 5))
             if ADD_AUDIO:
                 try:
@@ -205,7 +217,7 @@ def main():
             finalize(str(raw_path), str(final_path), row.get("caption", ""))
             raw_path.unlink(missing_ok=True)
 
-            public_url = upload_clip(str(final_path), f"{key}.mp4")
+            public_url = upload_asset(str(final_path), f"{key}.mp4")
             row["status"] = f"gen:{RUN_ID}"   # 使用済み（失敗時は空のまま＝次回再挑戦）
             made += 1
             print("  done:", public_url)
