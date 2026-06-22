@@ -34,7 +34,10 @@ count=${#new_files[@]}
 if [ "$count" -gt 0 ]; then
   echo "📷 写真アプリに取り込み中..."
   for f in "${new_files[@]}"; do
-    osascript -e "tell application \"Photos\" to import POSIX file \"$f\"" >/dev/null 2>&1 || true
+    case "$f" in
+      *.mp4|*.mov|*.jpg|*.jpeg|*.png)
+        osascript -e "tell application \"Photos\" to import POSIX file \"$f\"" >/dev/null 2>&1 || true ;;
+    esac
   done
   open "$DEST"
 fi

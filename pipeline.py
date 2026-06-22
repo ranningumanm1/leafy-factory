@@ -190,6 +190,7 @@ def main():
     print(f"[i] {len(todo)} 本を生成する（残り未使用: {remaining} 本）")
 
     made = 0
+    queue = []   # 画像のみモード用: (key, 公開URL, 動きプロンプト) をためてKling用一覧にする
     for row in todo:
         sid = row["id"].strip()
         key = f"{RUN_ID}_{sid}"
@@ -203,8 +204,8 @@ def main():
                 public_url = upload_asset(str(img_path), f"{key}.jpg", "image/jpeg")
                 row["status"] = f"img:{RUN_ID}"
                 made += 1
+                queue.append((key, public_url, row["motion_prompt"]))
                 print("  image:", public_url)
-                print("  Kling用プロンプト:", row["motion_prompt"])
                 continue
             vid = gen_video(img, row["motion_prompt"], int(row.get("duration", 5) or 5))
             if ADD_AUDIO:
@@ -226,8 +227,19 @@ def main():
         except Exception as e:
             print(f"  [!] shot {key} 失敗: {e}")
 
+    if IMAGE_ONLY and queue:
+        lines = ["# リーフィー Kling キュー（最新バッチ）",
+                 "# Klingに渡す設定: アスペクト比 9:16 / 長さ 10秒 / 音声と映像の同期=オン",
+                 "# 各画像はURLをそのままKlingに貼れます（ファイル不要）", ""]
+        for i, (k, u, p) in enumerate(queue, 1):
+            lines += [f"[{i}] {k}", f"  画像URL: {u}", f"  プロンプト: {p}", ""]
+        qpath = OUT_DIR / "kling_queue.txt"
+        qpath.write_text("\n".join(lines), encoding="utf-8")
+        upload_asset(str(qpath), "kling_queue.txt", "text/plain")
+        print("  kling_queue.txt を更新（URL+プロンプト一覧）")
+
     write_backlog(fieldnames, rows)
-    print(f"\n[i] 完成 {made} 本。Mac の fetch_clips.command で写真アプリに取り込めます")
+    print(f"\n[i] 完成 {made} 本。Mac の fetch_clips.command で取り込めます")
 
 
 if __name__ == "__main__":
