@@ -37,7 +37,7 @@ jobs:
           LORA_URL: ${{ secrets.LORA_URL }}
           TRIGGER_WORD: leafy_catspirit
           BATCH_SIZE: ${{ github.event.inputs.batch_size || '5' }}
-          IMAGE_ONLY: ${{ (github.event.inputs.mode || 'image') == 'video' && '0' || '1' }}
+          MODE: ${{ github.event.inputs.mode || 'image' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python pipeline.py
       - name: Commit backlog progress

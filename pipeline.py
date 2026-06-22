@@ -27,8 +27,9 @@ AUDIO_MODEL = os.environ.get("AUDIO_MODEL", "fal-ai/mmaudio-v2")
 ADD_AUDIO = os.environ.get("ADD_AUDIO", "1") not in ("0", "false", "False", "")
 SFX_NEG = os.environ.get(
     "SFX_NEG", "music, song, melody, human voice, speech, lyrics, harsh noise, distortion")
-# 画像のみモード: falではキャラ画像だけ生成（安い）。動画化は Kling.ai Pro で手動。
-IMAGE_ONLY = os.environ.get("IMAGE_ONLY", "0") not in ("0", "false", "False", "")
+# モード: image=falでキャラ画像だけ生成（安い・Klingで動画化） / video=falで動画まで（高い）
+MODE = os.environ.get("MODE", "image")
+IMAGE_ONLY = MODE.strip().lower() != "video"
 BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "5"))
 RUN_ID = os.environ.get("GITHUB_RUN_NUMBER") or datetime.date.today().isoformat()
 CAPTION_FONT = os.environ.get(
@@ -185,6 +186,7 @@ def main():
         print("[i] 未使用ネタなし。shotlist.csv に行を足してください。終了")
         return
     remaining = sum(1 for r in rows if not r.get("status", "").strip())
+    print(f"[i] モード: {MODE}（画像のみ={IMAGE_ONLY}）")
     print(f"[i] {len(todo)} 本を生成する（残り未使用: {remaining} 本）")
 
     made = 0
