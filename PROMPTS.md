@@ -24,8 +24,12 @@
 - 物理: bouncy squash-and-stretch（ぷにっと潰れて伸びる）
 - 間: holds a brief beat / pauses（笑いの“間”を必ず入れる）
 - 感情: beaming / shy giggle / proud / sparkly eyes など具体的に
-- カメラ: fixed camera（固定）
+- カメラ: locked static camera（固定。zoom/dolly/pull-back/shake すべて禁止）
 - 構図: full body in frame（全身キープ）
+- **縦枠ロック（最重要・必須）**: vertical 9:16 portrait framing held for the entire clip / 動作はすべて縦枠の内側に収める / 横方向の拡張・世界の引き(reveal)・レターボックス禁止。
+  Klingは「転ぶ/倒れる」等の大きな動作で勝手にカメラを引き、横に枠が伸びる事故を起こす。
+  この句は `pipeline.py` の `FRAMING_LOCK` が全motion_promptへ自動付与する（CSVには書かなくてよい）。
+  Kling操作時は『延長(extend)』『ズームアウト』を使わない。
 - 仕上げ: smooth loopable motion（つなぎ目が自然＝リール向き）
 - 例: takes two eager running steps and hops over the twig, catches a back paw and tumbles forward into a soft plush roll, holds a brief upside-down comedic beat, then springs upright beaming with a happy tail-wiggle — bouncy squash-and-stretch, gentle wholesome timing, fixed camera, full body in frame, smooth loopable motion
 

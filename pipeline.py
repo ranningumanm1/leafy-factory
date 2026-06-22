@@ -61,6 +61,16 @@ NEG = ("fire, flame, magical aura, glowing powers, collectible monster, game cre
        "resembling any existing franchise character, "
        "plain white background, blank studio backdrop, empty background")
 
+# フレーミング固定句（最重要・縦動画の着地を守る）。
+# Klingは「転ぶ/倒れる」等の大きな動作で勝手にカメラを引き、画面外＝横方向の世界を
+# 生成して「枠が横に伸びる」事故を起こす。これを毎回のmotion_promptに自動付与して封じる。
+FRAMING_LOCK = (
+    "vertical 9:16 portrait framing held for the entire clip, "
+    "locked static camera, no zoom, no dolly, no pull-back, no camera shake, "
+    "the character stays fully inside the vertical frame at all times, "
+    "all motion contained within the portrait frame, "
+    "no horizontal expansion, no widening, no letterboxing, no scene reveal to the sides")
+
 # 背景の世界観（ここを差し替えれば季節・舞台を変えられる）
 BACKGROUND = os.environ.get(
     "BACKGROUND",
@@ -82,9 +92,17 @@ def gen_keyframe(image_prompt: str) -> str:
     return r["images"][0]["url"]
 
 
+def lock_framing(motion_prompt: str) -> str:
+    """motion_prompt に縦9:16維持の固定句を必ず付ける（重複時は付けない）。"""
+    mp = (motion_prompt or "").strip().rstrip(",")
+    if "vertical 9:16 portrait framing held" in mp:
+        return mp
+    return f"{mp} — {FRAMING_LOCK}" if mp else FRAMING_LOCK
+
+
 def gen_video(image_url: str, motion_prompt: str, duration: int) -> str:
     r = fal_client.subscribe(VIDEO_MODEL, arguments={
-        "prompt": motion_prompt,
+        "prompt": lock_framing(motion_prompt),
         "duration": str(duration),
         "generate_audio": False,   # 音は mmaudio で別途・動きに合わせて付ける
         VIDEO_IMAGE_PARAM: image_url,
@@ -229,10 +247,12 @@ def main():
 
     if IMAGE_ONLY and queue:
         lines = ["# リーフィー Kling キュー（最新バッチ）",
-                 "# Klingに渡す設定: アスペクト比 9:16 / 長さ 10秒 / 音声と映像の同期=オン",
+                 "# Klingに渡す設定: アスペクト比 9:16（縦）固定 / 長さ 10秒 / 音声と映像の同期=オン",
+                 "# 重要: 生成中に『延長(extend)』や『ズームアウト』は使わない。最後まで縦9:16のまま。",
                  "# 各画像はURLをそのままKlingに貼れます（ファイル不要）", ""]
         for i, (k, u, p) in enumerate(queue, 1):
-            lines += [f"[{i}] {k}", f"  画像URL: {u}", f"  プロンプト: {p}", ""]
+            lines += [f"[{i}] {k}", f"  画像URL: {u}",
+                      f"  プロンプト: {lock_framing(p)}", ""]
         qpath = OUT_DIR / "kling_queue.txt"
         qpath.write_text("\n".join(lines), encoding="utf-8")
         upload_asset(str(qpath), "kling_queue.txt", "text/plain")
