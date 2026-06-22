@@ -23,6 +23,9 @@ for a in d.get('assets', []):
 new_files=()
 while IFS=$'\t' read -r name url; do
   [ -z "$name" ] && continue
+  case "$name" in
+    *.txt) curl -fsL "$url" -o "$DEST/$name" 2>/dev/null || true; continue ;;
+  esac
   if [ ! -f "$DEST/$name" ]; then
     echo "  ⬇️  $name"
     curl -fsSL "$url" -o "$DEST/$name"
